@@ -1,9 +1,9 @@
 #include "RPN.hpp"
 
-void mathVal(std::stack<int> &st, char c)
+void mathVal(std::stack<float> &st, char c)
 {
-	int val1;
-	int val2;
+	float val1;
+	float val2;
 
 	if (st.size() < 2)
 		throw invalidInput();
@@ -25,14 +25,14 @@ void mathVal(std::stack<int> &st, char c)
 	}
 }
 
-void fillStack(std::string &src, std::stack<int> &st)
+void fillStack(std::string &src, std::stack<float> &st)
 {
 	for (size_t i = 0; i < src.size(); i++)
 	{
 		switch (isCorrect(src[i]))
 		{
 			case 1: {break;}
-			case 2:	{st.push(src[i] - 48); break;}
+			case 2:	{st.push(static_cast<float>(src[i] - 48)); break;}
 			case 3: {mathVal(st, src[i]); break;}
 			default: {throw invalidInput();}
 		}
@@ -43,7 +43,7 @@ void fillStack(std::string &src, std::stack<int> &st)
 
 int main(int args, char **argv)
 {
-	std::stack<int> st;
+	std::stack<float> st;
 	std::string		input;
 
 	if (args != 2)
