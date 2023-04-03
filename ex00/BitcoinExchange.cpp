@@ -83,25 +83,27 @@ void mathValue(Date &dt, float value, std::map<Date, float> &src)
 static void checkCorrect(std::string &strVal)
 {
 	size_t	i;
+	size_t	size = strVal.length();
 
 	i = 0;
-	while (i < strVal.length() && std::isspace(strVal[i]))
+	while (i < size && std::isspace(strVal[i]))
 		i++;
-	while (i < strVal.length() && std::isdigit(strVal[i]))
+	if (i < size && (strVal[i] == '-' || strVal[i] == '+'))
 		i++;
-	if (strVal[i] == '.')
+	while (i < size && std::isdigit(strVal[i]))
 		i++;
-	while (i < strVal.length() && std::isdigit(strVal[i]))
+	if (i < size && strVal[i] == '.')
 		i++;
-	if (i != strVal.length())
-		throw charsAfterValue();
+	while (i < size && std::isdigit(strVal[i]))
+		i++;
+	if (i != size)
+		throw invalidCharsInValue();
 }
 
 void sepString(std::string &s, float &val, char del)
 {
 	ssize_t				ind = s.find(del);
 	std::stringstream	sStream;
-	char				skip;
 	std::string			strVal;
 
 	if (ind < 0)
@@ -111,15 +113,12 @@ void sepString(std::string &s, float &val, char del)
 	checkCorrect(strVal);
 	sStream << strVal;
 	sStream >> val;
-	if (sStream >> skip)
-		throw charsAfterValue();
 	s = s.substr(0, ind - 1);
 }
 
 bool	readFile(std::ifstream &file, std::map<Date, float> &src, char del)
 {
 	std::string s;
-	std::string s2;
 	Date		dt;
 	float		value;
 
@@ -134,10 +133,8 @@ bool	readFile(std::ifstream &file, std::map<Date, float> &src, char del)
 	}
 	while (std::getline(file, s))
 	{
-		//s2 = s;
 		try
 		{
-			//s.erase(std::remove_if(s.begin(), s.end(), ::isspace), s.end());
 			sepString(s, value, del);
 			dt = Date(s);
 			if (del == ',')
@@ -164,7 +161,7 @@ const char *NoDelimiterAtLine::what() const throw()
 	return ("Exception: there is no delimiter at line");
 }
 
-char const *charsAfterValue::what() const throw()
+char const *invalidCharsInValue::what() const throw()
 {
-	return ("Exception: there are one or more chars after value");
+	return ("Exception: there are invalid chars in value");
 }

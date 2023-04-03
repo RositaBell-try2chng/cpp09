@@ -18,7 +18,7 @@ class NoDelimiterAtLine : public std::exception
 	char const *what() const throw();
 };
 
-class charsAfterValue : public std::exception
+class invalidCharsInValue : public std::exception
 {
 	char const *what() const throw();
 };
