@@ -59,12 +59,6 @@ int die(char flg, std::ifstream *fileName)
 	return (1);
 }
 
-void skipHat(std::ifstream &data)
-{
-	std::string s;
-	std::getline(data, s);
-}
-
 void mathValue(Date &dt, float value, std::map<Date, float> &src)
 {
 	std::string str;
@@ -86,37 +80,64 @@ void mathValue(Date &dt, float value, std::map<Date, float> &src)
 	std::cout << dt << " => " << value << " = " << k * value << std::endl;
 }
 
+static void checkCorrect(std::string &strVal)
+{
+	size_t	i;
+
+	i = 0;
+	while (i < strVal.length() && std::isspace(strVal[i]))
+		i++;
+	while (i < strVal.length() && std::isdigit(strVal[i]))
+		i++;
+	if (strVal[i] == '.')
+		i++;
+	while (i < strVal.length() && std::isdigit(strVal[i]))
+		i++;
+	if (i != strVal.length())
+		throw charsAfterValue();
+}
+
 void sepString(std::string &s, float &val, char del)
 {
 	ssize_t				ind = s.find(del);
 	std::stringstream	sStream;
 	char				skip;
+	std::string			strVal;
 
 	if (ind < 0)
 		throw NoDelimiterAtLine();
 	ind++;
-	sStream << s.substr(ind, s.length() - ind);
+	strVal = s.substr(ind, s.length() - ind);
+	checkCorrect(strVal);
+	sStream << strVal;
 	sStream >> val;
 	if (sStream >> skip)
 		throw charsAfterValue();
 	s = s.substr(0, ind - 1);
-	while (ISSPACE(s[s.length() - 1]))
-		s = s.substr(0, s.length() - 1);
 }
 
 bool	readFile(std::ifstream &file, std::map<Date, float> &src, char del)
 {
 	std::string s;
+	std::string s2;
 	Date		dt;
 	float		value;
 
 	if (!file.is_open())
 		return (false);
-	skipHat(file);
+	std::getline(file, s);
+	s.erase(std::remove_if(s.begin(), s.end(), ::isspace), s.end());
+	if ((del == ',' && s != DB_HAT) || (del == '|' && s != INPUT_HAT))
+	{
+		putError(s.append(" <= BAD HAT"));
+		return (false);
+	}
 	while (std::getline(file, s))
 	{
+		//s2 = s;
 		try
 		{
+			//s.erase(std::remove_if(s.begin(), s.end(), ::isspace), s.end());
 			sepString(s, value, del);
 			dt = Date(s);
 			if (del == ',')
