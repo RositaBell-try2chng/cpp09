@@ -86,8 +86,6 @@ static void checkCorrect(std::string &strVal)
 	size_t	size = strVal.length();
 
 	i = 0;
-	while (i < size && std::isspace(strVal[i]))
-		i++;
 	if (i < size && (strVal[i] == '-' || strVal[i] == '+'))
 		i++;
 	while (i < size && std::isdigit(strVal[i]))
@@ -135,6 +133,7 @@ bool	readFile(std::ifstream &file, std::map<Date, float> &src, char del)
 	{
 		try
 		{
+			s.erase(std::remove_if(s.begin(), s.end(), ::isspace), s.end());
 			sepString(s, value, del);
 			dt = Date(s);
 			if (del == ',')
