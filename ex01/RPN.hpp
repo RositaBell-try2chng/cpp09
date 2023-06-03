@@ -22,6 +22,10 @@ class divByZero : public std::exception
 bool	isSign(char c);
 void	putError(std::string const &str);
 int		isCorrect(char c);
-void	printStack(std::stack<int> st);
+void	mathVal(std::stack<float> &st, char c);
+void	fillStack(std::string &src, std::stack<float> &st);
+
+//only for debug
+//void	printStack(std::stack<int> st);
 
 #endif

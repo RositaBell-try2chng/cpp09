@@ -1,8 +1,10 @@
-SRCS		= main.cpp PmergeMe.cpp
+SRCS		= main.cpp PmergeMe.cpp ListMerge.cpp VecMerge.cpp
 
 OBJS		= ${SRCS:.cpp=.opp}
 
 HEADER		= PmergeMe.hpp
+
+TEMPL		= PmergeMe.tpp
 
 NAME		= PmergeMe
 
@@ -14,7 +16,7 @@ CFLAGS		= -Wall -Wextra -Werror -std=c++98 -fsanitize=address
 
 all:		${NAME}
 
-%.opp:	%.cpp ${HEADER}
+%.opp:	%.cpp ${HEADER} ${TEMPL}
 		${CC} ${CFLAGS} -c $< -o $@
 
 ${NAME}:	${OBJS}

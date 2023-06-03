@@ -1,6 +1,5 @@
 #ifndef BITCOINEXCHANGE_HPP
-#define BITCOINEXCHANGE_HPP
-#define COURSES "./data.csv"
+# define BITCOINEXCHANGE_HPP
 
 # include <iostream>
 # include <string>
@@ -8,6 +7,7 @@
 # include <fstream>
 # include <sstream>
 
+# define COURSES "./data.csv"
 # define DB_HAT "date,exchange_rate"
 # define INPUT_HAT "date|value"
 
@@ -19,6 +19,11 @@ class NoDelimiterAtLine : public std::exception
 };
 
 class invalidCharsInValue : public std::exception
+{
+	char const *what() const throw();
+};
+
+class tooSmallDate : public std::exception
 {
 	char const *what() const throw();
 };

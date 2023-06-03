@@ -1,40 +1,23 @@
 #include "BitcoinExchange.hpp"
 #include "Date.hpp"
 
-static float findClosestDateValRec(std::map<Date, float> &src, Date dt, bool flgPlus, int &res)
-{
-	res++;
-	std::map<Date, float>::iterator f = src.find(dt);
-	if (f != src.end())
-		return (f->second);
-	if (flgPlus)
-		return (findClosestDateValRec(src, dt++, true, res));
-	return (findClosestDateValRec(src, dt--, false, res));
-}
-
 float findClosestDateVal(std::map<Date, float> &src, Date dt)
 {
-	int		minusRes = 0;
-	int		plusRes = 0;
-	float	minusFRes;
-	float	plusFRes;
-
 	std::map<Date, float>::iterator st = src.begin();
 	if (dt < st->first)
-		return (st->second);
+		throw tooSmallDate();
 
 	std::map<Date, float>::iterator en = --src.end();
 	if (dt > en->first)
 		return (en->second);
 
 	std::map<Date, float>::iterator f = src.find(dt);
-	if (f != src.end())
-		return (f->second);
-	minusFRes = findClosestDateValRec(src, dt--, false, minusRes);
-	plusFRes = findClosestDateValRec(src, (dt++)++, true, plusRes);
-	if (plusRes < minusRes)
-		return (plusFRes);
-	return (minusFRes);
+	while (f == src.end())
+	{
+		dt--;
+		f = src.find(dt);
+	}
+	return (f->second);
 }
 
 void putError(std::string &str)
@@ -80,10 +63,26 @@ void mathValue(Date &dt, float value, std::map<Date, float> &src)
 	std::cout << dt << " => " << value << " = " << k * value << std::endl;
 }
 
-static void checkCorrect(std::string &strVal)
+static bool isInt(std::string &strVal)
 {
 	size_t	i;
 	size_t	size = strVal.length();
+
+	i = 0;
+	if (i < size && (strVal[i] == '-' || strVal[i] == '+'))
+		i++;
+	while (i < size && std::isdigit(strVal[i]))
+		i++;
+	if (i != size)
+		return false;
+	return true;
+}
+
+static bool isFloat(std::string &strVal)
+{
+	size_t	i;
+	size_t	size = strVal.length();
+	size_t	tmpI;
 
 	i = 0;
 	if (i < size && (strVal[i] == '-' || strVal[i] == '+'))
@@ -94,8 +93,20 @@ static void checkCorrect(std::string &strVal)
 		i++;
 	while (i < size && std::isdigit(strVal[i]))
 		i++;
+	if (i < size && (strVal[i] == 'E' || strVal[i] == 'e'))
+	{
+		i++;
+		if (i < size && (strVal[i] == '-' || strVal[i] == '+'))
+			i++;
+		tmpI = i;
+		while (i < size && std::isdigit(strVal[i]))
+			i++;
+		if (i == tmpI)
+			return false;
+	}
 	if (i != size)
-		throw invalidCharsInValue();
+		return false;
+	return true;
 }
 
 void sepString(std::string &s, float &val, char del)
@@ -108,9 +119,14 @@ void sepString(std::string &s, float &val, char del)
 		throw NoDelimiterAtLine();
 	ind++;
 	strVal = s.substr(ind, s.length() - ind);
-	checkCorrect(strVal);
+	if (!isInt(strVal) && !isFloat(strVal))
+		throw invalidCharsInValue();
 	sStream << strVal;
 	sStream >> val;
+	strVal.clear();
+	sStream >> strVal;
+	if (strVal.length() != 0)
+		throw invalidCharsInValue();
 	s = s.substr(0, ind - 1);
 }
 
@@ -163,4 +179,9 @@ const char *NoDelimiterAtLine::what() const throw()
 char const *invalidCharsInValue::what() const throw()
 {
 	return ("Exception: there are invalid chars in value");
+}
+
+char const* tooSmallDate::what() const throw()
+{
+	return ("Exception: Date is too early");
 }
