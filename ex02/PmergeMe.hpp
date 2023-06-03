@@ -9,7 +9,7 @@
 #include <iterator>
 
 #define MAX_PRINT 20
-#define INSERT_BORDER 255
+#define INSERT_BORDER 20
 
 double	getTime();
 int		putErr(std::string const &str);
