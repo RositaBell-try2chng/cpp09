@@ -5,19 +5,19 @@ void printIts(std::list<int>::iterator start, std::list<int>::iterator end)
 	while (start != end)
 	{
 		std::cout << *start << ' ';
-		start++;
+		++start;
 	}
 	std::cout << std::endl;
 }
 
 static std::list<int>::iterator moveIt(std::list<int>::iterator start, int size, bool flgForward)
 {
-	for (int i = 0; i < size; i++)
+	for (int i = 0; i < size; ++i)
 	{
 		if (flgForward)
-			start++;
+			++start;
 		else
-			start--;
+			--start;
 	}
 	return (start);
 }
@@ -29,8 +29,8 @@ static void insertationSort(std::list<int> &lst, std::list<int>::iterator &begin
 	int							TMP;
 
 	//go until sort
-	it++;
-	for (; it != end; it++)
+	++it;
+	for (; it != end; ++it)
 	{
 		if (*it < *moveIt(it, 1, false))
 			break;
@@ -40,7 +40,7 @@ static void insertationSort(std::list<int> &lst, std::list<int>::iterator &begin
 	{
 		if (*it >= *moveIt(it, 1, false))
 		{
-			it++;
+			++it;
 			continue;
 		}
 		TMP = *it;
@@ -51,7 +51,7 @@ static void insertationSort(std::list<int> &lst, std::list<int>::iterator &begin
 		{
 			itTMP = begin;
 			while (*itTMP < TMP && itTMP != end)
-				itTMP++;
+				++itTMP;
 			lst.insert(itTMP, TMP);
 		}
 	}
@@ -69,25 +69,25 @@ static void merge(std::list<int>::iterator begin, std::list<int>::iterator middl
 		if (*it1 < *it2)
 		{
 			TMP.push_back(*it1);
-			it1++;
+			++it1;
 		}
 		else
 		{
 			TMP.push_back(*it2);
-			it2++;
+			++it2;
 		}
 	}
 	//fill full TMP
-	for (; it1 != middle; it1++)
+	for (; it1 != middle; ++it1)
 		TMP.push_back(*it1);
-	for (; it2 != end; it2++)
+	for (; it2 != end; ++it2)
 		TMP.push_back(*it2);
 	//copy TMP to lst
 	it2 = begin;
-	for (it1 = TMP.begin(); it1 != TMP.end(); it1++)
+	for (it1 = TMP.begin(); it1 != TMP.end(); ++it1)
 	{
 		*it2 = *it1;
-		it2++;
+		++it2;
 	}
 }
 

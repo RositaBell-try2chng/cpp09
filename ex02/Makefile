@@ -1,4 +1,4 @@
-SRCS		= main.cpp PmergeMe.cpp ListMerge.cpp VecMerge.cpp
+SRCS		= main.cpp PmergeMe.cpp VecMerge.cpp ListMerge.cpp
 
 OBJS		= ${SRCS:.cpp=.opp}
 
