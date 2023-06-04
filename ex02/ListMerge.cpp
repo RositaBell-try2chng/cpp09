@@ -1,5 +1,15 @@
 #include "PmergeMe.hpp"
 
+void printIts(std::list<int>::iterator start, std::list<int>::iterator end)
+{
+	while (start != end)
+	{
+		std::cout << *start << ' ';
+		start++;
+	}
+	std::cout << std::endl;
+}
+
 static std::list<int>::iterator moveIt(std::list<int>::iterator start, int size, bool flgForward)
 {
 	for (int i = 0; i < size; i++)
@@ -12,31 +22,21 @@ static std::list<int>::iterator moveIt(std::list<int>::iterator start, int size,
 	return (start);
 }
 
-static void	finishIt(std::list<int>::iterator &itSrc, std::list<int> &lst, std::list<int>::iterator &itLst)
+static void insertationSort(std::list<int> &lst, std::list<int>::iterator &begin, std::list<int>::iterator &end)
 {
-	while (itLst != lst.end())
-	{
-		*itLst = *itSrc;
-		itLst++;
-		itSrc++;
-	}
-}
-
-static void insertationSort(std::list<int> &lst)
-{
-	std::list<int>::iterator	it = lst.begin();
-	std::list<int>::iterator	iter = ++lst.begin();;
+	std::list<int>::iterator	it = begin;
+	std::list<int>::iterator	itTMP;
 	int							TMP;
 
 	//go until sort
-	for (; iter != lst.end(); iter++)
+	it++;
+	for (; it != end; it++)
 	{
-		if (*iter < *it)
+		if (*it < *moveIt(it, 1, false))
 			break;
-		it++;
 	}
 	//move all
-	while (it != lst.end())
+	while (it != end)
 	{
 		if (*it >= *moveIt(it, 1, false))
 		{
@@ -45,66 +45,69 @@ static void insertationSort(std::list<int> &lst)
 		}
 		TMP = *it;
 		it = lst.erase(it);
-		if (TMP <= *lst.begin())
-			lst.push_front(TMP);
+		if (TMP <= *begin)
+			begin = lst.insert(begin, TMP);
 		else
 		{
-			iter = lst.begin();
-			while (TMP > *iter)
-				iter++;
-			lst.insert(iter, TMP);
+			itTMP = begin;
+			while (*itTMP < TMP && itTMP != end)
+				itTMP++;
+			lst.insert(itTMP, TMP);
 		}
 	}
 }
 
-static void	mergeSort(std::list<int> &lst, size_t size)
+static void merge(std::list<int>::iterator begin, std::list<int>::iterator middle, std::list<int>::iterator end)
 {
-	//exit from recursive
-	if (size <= INSERT_BORDER)
+	std::list<int> TMP;
+	std::list<int>::iterator it1 = begin;
+	std::list<int>::iterator it2 = middle;
+
+	//fill TMP with choice
+	while (it1 != middle && it2 != end)
 	{
-		insertationSort(lst);
-		return;
-	}
-	//divide and sort two small lists
-	size_t sizeA = size / 2;
-	size_t sizeB = sizeA + size % 2;
-	std::list<int> A(sizeA);
-	std::list<int> B(sizeB);
-	std::list<int>::iterator iter;
-
-	std::list<int>::iterator it = lst.begin();
-	std::list<int>::iterator it2 = moveIt(it, sizeA, true);
-	A.assign(it, it2);
-
-	it2 = lst.end();
-	it = moveIt(it2, sizeB, false);
-	B.assign(it, it2);
-
-	mergeSort(A, sizeA);
-	mergeSort(B, sizeB);
-
-	//fill lst in correct order
-	it = A.begin();
-	it2 = B.begin();
-	iter = lst.begin();
-	while (it != A.end() && it2 != B.end() && iter != lst.end())
-	{
-		if (*it < *it2)
+		if (*it1 < *it2)
 		{
-			*iter = *it;
-			it++;
+			TMP.push_back(*it1);
+			it1++;
 		}
 		else
 		{
-			*iter = *it2;
+			TMP.push_back(*it2);
 			it2++;
 		}
-		iter++;
 	}
-	if (it != A.end())
-		finishIt(it, lst, iter);
-	else
-		finishIt(it2, lst, iter);
+	//fill full TMP
+	for (; it1 != middle; it1++)
+		TMP.push_back(*it1);
+	for (; it2 != end; it2++)
+		TMP.push_back(*it2);
+	//copy TMP to lst
+	it2 = begin;
+	for (it1 = TMP.begin(); it1 != TMP.end(); it1++)
+	{
+		*it2 = *it1;
+		it2++;
+	}
+}
+
+static void	mergeSort(std::list<int> &lst, std::list<int>::iterator &begin, std::list<int>::iterator &end)
+{
+	std::list<int>::iterator middle;
+	size_t	size = std::distance(begin, end);
+	//exit from recursive
+	if (size <= INSERT_BORDER)
+	{
+		insertationSort(lst, begin, end);
+		return;
+	}
+	//divide and sort two small lists
+	middle = begin;
+	middle = moveIt(middle, (size / 2), true);
+	mergeSort(lst, begin, middle);
+	mergeSort(lst, middle, end);
+	//merge
+	merge(begin, middle, end);
 }
 
 void	doItFor1(int arr[], size_t size)
@@ -116,7 +119,11 @@ void	doItFor1(int arr[], size_t size)
 	fillCont(arr, size, lst);
 	ts = getTime();
 	if (size > 1)
-		mergeSort(lst, size);
+	{
+		std::list<int>::iterator begin = lst.begin();
+		std::list<int>::iterator end = lst.end();
+		mergeSort(lst, begin, end);
+	}
 	ts = getTime() - ts;
 	printCont(lst);
 	std::cout << "Time to process a range of " << size << " elements with std::list : " << ts << " ms" << std::endl;

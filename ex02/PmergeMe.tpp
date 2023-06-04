@@ -31,7 +31,7 @@ void printCont(T &cont)
 	typename T::iterator	iter = cont.begin();
 	int						i = 0;
 
-	std::cout << "After: ";
+	//std::cout << "After: ";
 	while (iter != cont.end() && i < MAX_PRINT)
 	{
 		std::cout << *iter << " ";

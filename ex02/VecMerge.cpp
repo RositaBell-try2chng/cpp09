@@ -28,9 +28,7 @@ static void	insertationSort(std::vector<int> &vec, std::vector<int>::iterator it
 		{
 			itTMP = itStart;
 			while (*itTMP < TMP && itTMP != itEnd)
-			{
 				itTMP++;
-			}
 			vec.insert(itTMP, TMP);
 		}
 	}
